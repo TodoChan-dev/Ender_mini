@@ -115,6 +115,8 @@ public class GameSet implements CommandExecutor, TabCompleter {
                     task.runTaskTimer(Ender_mini.plugin,0L,20L);
 
                 }else {
+
+
                     for(Player player : Bukkit.getOnlinePlayers()){
                         BOSSBAR.addPlayer(player);
                         BOSSBAR.setVisible(true);
@@ -133,28 +135,28 @@ public class GameSet implements CommandExecutor, TabCompleter {
                                     BOSSBAR.setVisible(false);
                                     KillDragon.game = false;
                                 }
-                                final int min = (int)Math.floor(i / 60);
-                                if(counter == 1) {
-                                    if(i % 2 == 0 && i > 10){
-                                        BOSSBAR.setTitle("残り時間： " + ChatColor.RED + i % 60 + " 秒");
-                                    }else {
-                                        BOSSBAR.setTitle("残り時間： " + ChatColor.YELLOW + i % 60 + " 秒");
-                                        BOSSBAR.setColor(BarColor.RED);
-                                    }
-                                } if(counter > 1 && counter < 60){ //1分を超えて1時間を超えない場合の処理
-                                    if(i % 2 == 0){ //秒数が偶数の場合
-                                        BOSSBAR.setTitle("残り時間： " + ChatColor.RED + min + " 分 " + i % 60 +" 秒");
-                                    }else //奇数の場合
-                                        BOSSBAR.setTitle("残り時間： " + ChatColor.YELLOW + min + " 分 " + i % 60 + " 秒");
-                                }else if(counter >= 60){
-                                    if(i % 2 == 0){ //秒数が偶数の場合
-                                        BOSSBAR.setTitle("残り時間： " + ChatColor.RED + min/60 + " 時間 " + min + ChatColor.GOLD + " 分 " + i % 60 + " 秒");
-                                    }else //奇数の場合
-                                        BOSSBAR.setTitle("残り時間： " + ChatColor.YELLOW + min/60 + " 時間 " + min + " 分" + i % 60 + " 秒");
-                                }
-                                double barValue = i / criterion;
-                                BOSSBAR.setProgress(barValue);
                             }
+                            final int min = (int)Math.floor(i / 60);
+                            if(counter == 1) {
+                                if(i % 2 == 0 && i > 10){
+                                    BOSSBAR.setTitle("残り時間： " + ChatColor.RED + i % 60 + " 秒");
+                                }else {
+                                    BOSSBAR.setTitle("残り時間： " + ChatColor.YELLOW + i % 60 + " 秒");
+                                    BOSSBAR.setColor(BarColor.RED);
+                                }
+                            } if(counter > 1 && counter < 60){ //1分を超えて1時間を超えない場合の処理
+                                if(i % 2 == 0){ //秒数が偶数の場合
+                                    BOSSBAR.setTitle("残り時間： " + ChatColor.RED + min + " 分 " + i % 60 +" 秒");
+                                }else //奇数の場合
+                                    BOSSBAR.setTitle("残り時間： " + ChatColor.YELLOW + min + " 分 " + i % 60 + " 秒");
+                            }else if(counter >= 60){
+                                if(i % 2 == 0){ //秒数が偶数の場合
+                                    BOSSBAR.setTitle("残り時間： " + ChatColor.RED + min/60 + " 時間 " + min + ChatColor.GOLD + " 分 " + i % 60 + " 秒");
+                                }else //奇数の場合
+                                    BOSSBAR.setTitle("残り時間： " + ChatColor.YELLOW + min/60 + " 時間 " + min + " 分" + i % 60 + " 秒");
+                            }
+                            double barValue = ((double)i) / criterion;
+                            BOSSBAR.setProgress(barValue);
 
 
                             i--;

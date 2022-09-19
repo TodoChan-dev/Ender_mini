@@ -9,145 +9,96 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.scoreboard.*;
-import org.checkerframework.checker.units.qual.A;
-import org.json.JSONArray;
-import org.json.JSONObject;
-import tproject.ender_mini.Utils.Players;
+import tproject.ender_mini.Ender_mini;
 
-import javax.print.DocFlavor;
-import java.io.BufferedWriter;
-import java.nio.file.Files;
-import java.nio.file.Paths;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
-import java.util.Set;
+import java.util.HashMap;
+import java.util.UUID;
+
 
 public class PlayerJoin implements Listener {
 
-    public static ScoreboardManager scoreboardManager = Bukkit.getScoreboardManager();
-    public static Scoreboard scoreboard;
-    public static JSONObject json = new JSONObject();
-    public static JSONArray jsonArray = new JSONArray();
+
+    public static HashMap<UUID, Scoreboard> playerScoreboards;
+
+    public PlayerJoin() {
+        playerScoreboards = new HashMap<>();
+    }
+
 
 
     //プレイヤーが参加したときの処理
     @EventHandler
-    public static void onJoin(PlayerJoinEvent e) {
-        json.put(e.getPlayer().getName(), java.util.Optional.empty());
+    public void onJoin(PlayerJoinEvent e) {
+        Team red = Ender_mini.red;
+        Team blue = Ender_mini.blue;
+
+        Player p = e.getPlayer();
+        String name = p.getName();
+
+        if(red.hasEntry(name) || blue.hasEntry(name))return;
+
+        if (Bukkit.getOnlinePlayers().size() % 2 == 0) {
+            red.addEntry(name);
+        } else {
+            blue.addEntry(name);
+        }
+
+
+
+
         createScoreBoard(e.getPlayer());
-        update();
+        update(e.getPlayer());
+        p.setScoreboard(Ender_mini.scoreboard);
     }
 
     @EventHandler
-    public static void onQuit(PlayerQuitEvent e) {
-        update();
+    public void onQuit(PlayerQuitEvent e) {
+        update(e.getPlayer());
     }
 
     public static void createScoreBoard(Player player) {
-        //以下スコアボード作成のためのベース
-        scoreboard = scoreboardManager.getNewScoreboard();
-        Objective objective = scoreboard.registerNewObjective("チーム", "dummy");
-        objective.setDisplayName("情報-INFO");
+
+        Scoreboard scoreboard = Bukkit.getScoreboardManager().getNewScoreboard();
+        Objective objective = scoreboard.registerNewObjective("info",Criteria.DUMMY,"Hello World");
         objective.setDisplaySlot(DisplaySlot.SIDEBAR);
-        String teamName = null;
-        for (Team team : scoreboard.getTeams()) {
-            if (team.hasEntry(player.getDisplayName())) {
-                teamName = team.getName();
-            }
-            if (teamName == null) return;
 
-        }
+        UUID uuid = player.getUniqueId();
 
-        //以下表示させたい情報
-
-
-        //以上表示させたい情報
-
-        //以下チーム作成
-        Team red = scoreboard.registerNewTeam("RED");
-        Team blue = scoreboard.registerNewTeam("BLUE");
-
-        //赤チームの設定
-        red.setPrefix(ChatColor.RED + "[赤チーム] " + ChatColor.WHITE);
-        red.setAllowFriendlyFire(false);
-        red.setCanSeeFriendlyInvisibles(true);
-        red.setDisplayName("赤チーム");
-
-        //青チームの設定
-        blue.setPrefix(ChatColor.BLUE + "[青チーム] " + ChatColor.WHITE);
-        blue.setAllowFriendlyFire(false);
-        blue.setCanSeeFriendlyInvisibles(true);
-        blue.setDisplayName("青チーム");
-
-
-
-        //String[] names = new String[Bukkit.getOnlinePlayers().size()];
-        List<String> namesRED = new ArrayList<>();
-        List<String> namesBLUE = new ArrayList<>();
-
-
-        //チームのセットの分散の昨日のやつ（小並感）
-        if (Bukkit.getOnlinePlayers().size() % 2 == 0) {
-            namesRED.add(player.getName());
-            int rC = namesRED.size();
-            red.addPlayer(player);
-
-            for(int i = 0; i< rC; i++){
-                json = new JSONObject();
-                json.put(namesRED.get(i), "red");
-                jsonArray.put(json);
-            }
-
-
-
-
-            String fileName = "Date.json";
-            try (BufferedWriter writer = Files.newBufferedWriter(Paths.get(fileName))) {
-                json.write(writer);
-            } catch (Exception e) {
-                System.err.println(e.getMessage());
-            }
-
-
-        } else {
-            namesBLUE.add(player.getName());
-            blue.addPlayer(player);
-            int bC = namesBLUE.size();
-            for(int i = 0; i< bC; i++){
-                json = new JSONObject();
-                json.put(namesBLUE.get(i), "blue");
-                jsonArray.put(json);
-            }
-
-
-            String fileName = "Date.json";
-            try (BufferedWriter writer = Files.newBufferedWriter(Paths.get(fileName))) {
-                json.write(writer);
-            } catch (Exception e) {
-                System.err.println(e.getMessage());
-            }
-        }
-
-        String teams = (String) json.get(player.getName());
-
-
-        Score score1;
-        if (teams.equals("red")) {
-            score1 = objective.getScore("所属：" + ChatColor.RED + "[赤チーム]");
-        } else {
-            score1 = objective.getScore("所属：" + ChatColor.BLUE + "[青チーム]");
-        }
-        score1.setScore(98);
+        playerScoreboards.put(uuid,scoreboard);
 
         player.setScoreboard(scoreboard);
+        update(player);
     }
 
-    public static void update() {
-        for (Player player : Bukkit.getOnlinePlayers()) {
-            Score score = Objects.requireNonNull(player.getScoreboard().getObjective(DisplaySlot.SIDEBAR)).getScore("全参加者数：");
-            score.setScore(Bukkit.getOnlinePlayers().size());
+
+
+    public static void update(Player player) {
+        UUID uuid = player.getUniqueId();
+        Scoreboard scoreboard = playerScoreboards.get(uuid);
+        Objective objective = scoreboard.getObjective("info");
+
+        for (String entry : scoreboard.getEntries()) {
+            scoreboard.resetScores(entry);
         }
+        String teamName = "";
+        int teamSize = -1;
+        if (Ender_mini.red.hasEntry(player.getName())) {
+            teamName = "赤チーム";
+            teamSize = Ender_mini.red.getEntries().size();
+        } else if (Ender_mini.blue.hasEntry(player.getName())) {
+            teamName = "青チーム";
+            teamSize = Ender_mini.blue.getEntries().size();
+        }
+        Score teamNameScore = objective.getScore("現在のチーム: " + teamName);
+        Score teamSizeScore = objective.getScore("チーム人数: " + teamSize);
+        Score onlineSizeScore = objective.getScore("現在の人数: " + Bukkit.getOnlinePlayers().size());
+        teamNameScore.setScore(0);
+        teamSizeScore.setScore(-1);
+        onlineSizeScore.setScore(-2);
+
+
+        player.setScoreboard(scoreboard);
+
     }
 
 

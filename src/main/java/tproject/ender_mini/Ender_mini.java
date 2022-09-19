@@ -34,8 +34,14 @@ public final class Ender_mini extends JavaPlugin {
     private void initScoreBoard(){
         scoreboard = Bukkit.getScoreboardManager().getMainScoreboard();
 
-        red = scoreboard.registerNewTeam("RED");
-        blue = scoreboard.registerNewTeam("BLUE");
+        red = scoreboard.getTeam("RED");
+        if(red == null){
+            red = scoreboard.registerNewTeam("RED");
+        }
+        blue = scoreboard.getTeam("BLUE");
+        if(blue == null){
+            blue = scoreboard.registerNewTeam("BLUE");
+        }
 
 
 

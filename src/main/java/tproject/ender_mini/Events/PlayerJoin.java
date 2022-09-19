@@ -47,13 +47,16 @@ public class PlayerJoin implements Listener {
 
 
         createScoreBoard(e.getPlayer());
-        update(e.getPlayer());
-        p.setScoreboard(Ender_mini.scoreboard);
+        for(Player ppppp : Bukkit.getOnlinePlayers()){
+            update(e.getPlayer());
+        }
     }
 
     @EventHandler
     public void onQuit(PlayerQuitEvent e) {
-        update(e.getPlayer());
+        for(Player ppppp : Bukkit.getOnlinePlayers()){
+            update(e.getPlayer());
+        }
     }
 
     public static void createScoreBoard(Player player) {
@@ -67,7 +70,10 @@ public class PlayerJoin implements Listener {
         playerScoreboards.put(uuid,scoreboard);
 
         player.setScoreboard(scoreboard);
-        update(player);
+        for(Player p : Bukkit.getOnlinePlayers()){
+            update(player);
+        }
+
     }
 
 

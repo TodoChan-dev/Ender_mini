@@ -48,22 +48,24 @@ public class PlayerJoin implements Listener {
 
         createScoreBoard(e.getPlayer());
         for(Player ppppp : Bukkit.getOnlinePlayers()){
-            update(e.getPlayer());
+            update(ppppp);
         }
     }
 
     @EventHandler
     public void onQuit(PlayerQuitEvent e) {
         for(Player ppppp : Bukkit.getOnlinePlayers()){
-            update(e.getPlayer());
+            update(ppppp);
         }
     }
 
-    public static void createScoreBoard(Player player) {
+    public void createScoreBoard(Player player) {
+        ScoreboardManager scoreboardManager = Bukkit.getScoreboardManager();
 
-        Scoreboard scoreboard = Bukkit.getScoreboardManager().getNewScoreboard();
-        Objective objective = scoreboard.registerNewObjective("info",Criteria.DUMMY,"Hello World");
+        Scoreboard scoreboard = scoreboardManager.getNewScoreboard();
+        Objective objective = scoreboard.registerNewObjective("info","dummy");
         objective.setDisplaySlot(DisplaySlot.SIDEBAR);
+        objective.setDisplayName("イベント情報");
 
         UUID uuid = player.getUniqueId();
 
@@ -71,7 +73,7 @@ public class PlayerJoin implements Listener {
 
         player.setScoreboard(scoreboard);
         for(Player p : Bukkit.getOnlinePlayers()){
-            update(player);
+            update(p);
         }
 
     }

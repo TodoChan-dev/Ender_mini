@@ -1,0 +1,13 @@
+name: Ender_mini
+version: '${project.version}'
+main: tproject.ender_mini.Ender_mini
+api-version: 1.19
+prefix: Ender_Mini
+authors: [ TDMN03 ]
+description: this is only use a T-Project
+website: https://tproject.net
+
+commands:
+  game:
+    description: this is only use a T-Project
+    permission: op
